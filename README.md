@@ -59,16 +59,16 @@
 * [우범지역](http://13.209.81.67/)
 * 시작화면
 
-![home](C:\Users\EHwooKim\Desktop\Project-movie\readmeImg\home.jpg)
+![home](./readmeImg/home.jpg)
 
 * 장르선택
 
-![genre](C:\Users\EHwooKim\Desktop\Project-movie\readmeImg\genre.jpg)
+![genre](./readmeImg/genre.jpg)
 
 * 영화목록
 
-![index](C:\Users\EHwooKim\Desktop\Project-movie\readmeImg\index.jpg)
+![index](./readmeImg/index.jpg)
 
 * 영화 상세보기
 
-![detail](C:\Users\EHwooKim\Desktop\Project-movie\readmeImg\detail.jpg)
+![detail](./readmeImg/detail.jpg)
