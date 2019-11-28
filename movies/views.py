@@ -64,15 +64,24 @@ def detail(request, movie_pk):
     movie = get_object_or_404(Movie, movieid=movie_pk)
     genre_list = []
     movie_genre_list = eval(movie.genres)
+    movie_comments = movie.comment_set.all()
+    sum_score = 0
+    for comment in movie_comments:
+        sum_score += comment.score
+    if not len(movie_comments):
+        movie.score = 0 
+    else:
+        movie.score = round((sum_score) / len(movie_comments), 1)
     for genre in movie_genre_list:
         genre_item = Genre.objects.get(id=genre)
         genre_list.append(genre_item.name)
     movie.genres = genre_list
+    
     video_list = ''
     if eval(movie.videos):
         video_list = (eval(movie.videos)[0])
     movie.videos = video_list
-    movie.credit = eval(movie.credit)
+    movie.credit = eval(movie.credit)[:12]
     re_movie = get_re(movie_pk)
     comments = movie.comment_set.all()
     comment_form = CommentForm()
@@ -181,9 +190,6 @@ def comment_create(request, movie_pk):                          # 여기다가 �
             comment.movie = movie
             comment.user = request.user
             comment.save()
-            num = len(movie.comment_set.all())
-            movie.score = ((movie.score *(num - 1)) + comment.score) / num
-            movie.save()
             return redirect('movies:detail', movie_pk)
         # 타당하지 않을 경우 Alert 창 띄우면 될것같은데...
     else:
