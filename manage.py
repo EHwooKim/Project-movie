@@ -2,10 +2,11 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from decouple import config
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastProject.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastProject.settings.local')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
