@@ -17,9 +17,13 @@ def home(request):
         return redirect('movies:index')
     signupform = CustomUserCreationForm()
     loginform = AuthenticationForm()
+    movie_count = Movie.objects.all().count()
+    review_count = Comment.objects.all().count()
     context = {
         'signupform': signupform,
-        'loginform': loginform
+        'loginform': loginform,
+        'movie_count': movie_count,
+        'review_count' : review_count
     }
     return render(request, 'movies/home.html', context)
 
