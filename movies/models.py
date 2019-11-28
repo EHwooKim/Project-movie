@@ -37,6 +37,6 @@ class Genre(models.Model):
     name = models.TextField()
     
 class Actor(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
     gender = models.IntegerField()
     images = models.URLField()
