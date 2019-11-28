@@ -1,15 +1,15 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Movie, Genre
 from accounts.forms import CustomUserCreationForm
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from IPython import embed
-from .forms import CommentForm
-from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-import datetime
-import requests
-import random
+from django.http import HttpResponse,JsonResponse, HttpResponseRedirect
+from django.contrib.auth import get_user_model
+from .models import Movie, Genre, MK, MG, Comment
+from .forms import CommentForm
+from IPython import embed
+import datetime, requests, random
+
+
 # Create your views here.
 
 def home(request):
@@ -27,18 +27,35 @@ def index(request):
     User = get_user_model()
     user = get_object_or_404(User, username=request.user)
     if user.preference.all():
-        now_list = getNow()
+        now_list = recommendation_2(request.user.id)
         movie_list = []
         for idx in user.preference.all():   
             genre_movie = {}
+            imsi_list = []
+            movies = []
             genre_movie['genre'] = Genre.objects.get(id=idx.id).name
-            movie = Movie.objects.filter(genres__contains= idx.id).order_by('-popularity')
-            genre_movie['genre_movie_list'] = movie[:10]
+            result = MG.objects.filter(genre = idx.id).order_by('-popularity')
+            for movie in result:
+                try:
+                    item = Movie.objects.get(movieid=movie.movieid)
+                    movies.append(item)
+                    if len(movies) == 10:
+                        break
+                except:
+                    continue
+            genre_movie['genre_movie_list'] = movies[:10]
+            
+            
+
+            #movie = Movie.objects.filter(genres__contains= idx.id).order_by('-popularity')
+            #embed()
+            #genre_movie['genre_movie_list'] = movie[:10]
             movie_list.append(genre_movie)
         context = {
             'movie_list' : movie_list,
             'now' : now_list
         }
+
         return render(request, 'movies/index.html', context)
     else:
         return redirect('accounts:genre')
@@ -58,13 +75,13 @@ def detail(request, movie_pk):
     movie.credit = eval(movie.credit)
     re_movie = get_re(movie_pk)
     comments = movie.comment_set.all()
-
+    comment_form = CommentForm()
     context = {
         'movie': movie,
         're_movie' : re_movie,
         'comments' : comments,
+        'comment_form' : comment_form
     }
-    
     return render(request,'movies/detail.html', context)
     
 def getNow():
@@ -78,7 +95,7 @@ def getNow():
     api_key = '69855813cd52f7cdbc7e336c8afaac95'
     for movie in response:
         try:
-            item = Movie.objects.get(title=movie.get('movieNm'))
+            item = Movie.objects.filter(title=movie.get('movieNm')).order_by('-release_date')
             movie_list.append(item)
         except:
             movie_title = movie.get('movieNm')
@@ -88,12 +105,21 @@ def getNow():
                 movie_id = response_2[0].get('id')
             else:
                 continue
-            detail_url = f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=ko-KR&append_to_response=videos%2Ccredits'
+            detail_url = f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=ko-KR&append_to_response=videos%2Ckeywords%2Ccredits'
             response_detail = requests.get(detail_url).json()
             genre_list = []
             video_list = []
+            G = len(MG.objects.all())
             for genre in response_detail.get('genres'):
                 genre_list.append(genre.get('id'))
+                MG.objects.create(id=G, movieid=movie_id, genre=genre.get('id'),popularity=response_detail.get('popularity'))
+                G += 1
+
+            K = len(MK.objects.all())
+            for keyword in response_detail.get('keywords').get('keywords'):
+                MK.objects.create(id=K, movieid=movie_id, keyword=keyword.get('id'), popularity = response_detail.get('popularity'))
+                K += 1
+            
             a = response_detail.get('videos').get('results')
             if a:
                 for movie in a:
@@ -116,17 +142,8 @@ def get_re(a):
     recommendation_list = []
     if not response:                                # 추천 영화 없으면
         return recommendation_list
-    # if len(response) >= 10:
-    #     for i in range(10):
-    #         embed()
-    #         movie_list.append(response[i].get('id'))
-    # else:
-    #     for i in range(len(response)):
-    #         movie_list.append(response[i].get('id'))
-    response = response[:10]
-    for i in range(len(response)):
+    for i in range(10):
         movie_list.append(response[i].get('id'))
-        
     for movie in movie_list:
         genre_list = []
         video_list = []
@@ -177,23 +194,29 @@ def comment_create(request, movie_pk):                          # 여기다가 �
 def comment_delete(request, movie_pk, comment_pk):
     comment = Comment.objects.get(pk=comment_pk)
     comment.delete()
-    return redirect('movies:detail', movie_pk)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 ########################################좋아요############################
 
 def like(request, movie_pk):
     if request.user.is_authenticated:
         movie = get_object_or_404(Movie, movieid=movie_pk)
+        is_liked = True
         if request.user in movie.like_users.all():
             movie.like_users.remove(request.user)
+            is_liked = False
         else:
             movie.like_users.add(request.user)
-        return redirect('movies:detail', movie_pk)
+            is_liked = True
+        return JsonResponse({'is_liked':is_liked})
     else:
-        return redirect('accounts:login')
+        return redirect('/')
 ###########################################################################
 
-def recommendation_2(request):
-    comments = get_object_or_404(Comment, user=request.user.id)
+def recommendation_2(a):
+    try:
+        comments = Comment.objects.filter(user=a)
+    except:
+        return []
     high_list = []
     highest_val = -0xffffff
     for comment in comments:
@@ -205,18 +228,22 @@ def recommendation_2(request):
             high_list.append(comment.movie)
     
     if not len(high_list):
-        lists = (Movie.objects.all().order_by('-score','-popularity'))[:10]
-        return lists
+        lists = Movie.objects.all().order_by('-score','-popularity')
+        return lists[:10]
     movie = random.choice(high_list)   
-    keywords = Movie.objects.get(movieid=movie).get('keywords')
-    recommendation_list = Movie.objects.filter(keyword__in=keywords).order_by('-score', '-popularity')
+    key_list = []
+    keywords = eval((Movie.objects.get(movieid=movie.movieid)).keywords)
+    for keyword in keywords:
+        
+        lists = MK.objects.filter(keyword=keyword)
+        for item in lists:
+            if item.movieid not in key_list:
+                key_list.append(item.movieid)
+    recommendation_list = Movie.objects.filter(movieid__in=key_list).order_by('-score','-popularity')
     if not recommendation_list:
         return []
     else:
-        if len(recommendation_list) > 10:
-            return recommendation_list[:10]
-        else:
-            return recommendation_list
+        return recommendation_list[:10]
 
 def about(request):
     return render(request, 'movies/about.html')

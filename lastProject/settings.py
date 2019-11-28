@@ -11,23 +11,21 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-from decouple import config
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = 'zsj4#5%q*7mh6!@#fw_qpfehw+3=ad*vx6#j8f3lu0i0q!%sx%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# 배포 위해 밑에 두개 삭제(주석처리)
-# DEBUG = True
+DEBUG = True
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -126,6 +124,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 ) 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # 배포를 위한 경로
 
 AUTH_USER_MODEL = 'accounts.User'

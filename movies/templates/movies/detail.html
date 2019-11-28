@@ -50,6 +50,7 @@
           </p>
           <p>{{movie.overview}} </p>
           <p>인기도: {{movie.popularity}}</p>
+          <p>평점: {{movie.score}}</p>
           <p>상영시간: {{movie.runtime}}분</p>
           <p>개봉일: {{movie.release_date}}</p>
           {% if user in movie.like_users.all %}
@@ -92,7 +93,7 @@
           <img  width="100%" src="https://image.tmdb.org/t/p/w200{{item.profile_path}}">
           {% else %}
           <img  width="100%" src="{% static 'movies/images/unknown.jpg' %}">
-          {% endif %}
+          {% endif%}
           <p>{{item.name}}</p>
         </div>
       {% endfor %}
@@ -101,7 +102,7 @@
     <div class="mt-3">
     <hr>
     <h1>평점</h1>
-      {% if user not in movie.comment_set.all %}
+      {% if 'true'%}
     <div>
       <form action="{% url 'movies:c_comment' movie.pk %}" method="POST">
         {% csrf_token%}
