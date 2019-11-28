@@ -63,14 +63,37 @@
       height: 20%;
       padding: 50px
     }
+    .count {
+      font-size: 40px;
+    }
   </style>
 </head>
 <body>
   <div class="div01">
     <div class="home-bg-01 row">
       <div class="col-7 form-bg-left text-center">
-        <div class="left-top">movie 몇개 actor 몇개 등등</div>
-        <div class="left-bottom"><h1>About us</h1></div>
+        <div class="left-top">
+          <p style="font-size: 80px; font-weight: bold;">데이터 현황</p>
+          <div class="row mt-4">
+            <div class="col-4">
+              <i class="fas fa-video" style="color:white; font-size: 130px;"></i>
+              <p class="count">873개</p>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-film" style="color:white; font-size: 130px;"></i>
+              <p class="count">18개</p>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-user-alt" style="color:white; font-size: 130px;"></i>
+              <p class="count">373개</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="left-bottom">
+          <a style="color:white;" href="/about/"><h1>About us</h1></a>
+          
+        </div>
       </div>
       <div class="col-1"></div>
       <div class="col-4 form-bg-right">
@@ -149,6 +172,7 @@
       signupForm.style.display = "inline"
     })
   </script>
+  <script src="https://kit.fontawesome.com/f7a84a7607.js" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> 

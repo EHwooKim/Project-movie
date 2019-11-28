@@ -2,14 +2,10 @@
 
 {% block css %}
   <style>
-    html {
-      height: max-content;
-    }
     * {
       color: white;
     }
     body {
-      height: 100vh;
       background: #131313;    
     }
     hr {
@@ -33,7 +29,7 @@
       {% for movie in user.like_movies.all %}
       <div class="col-3">
         <a href="{% url 'movies:detail' movie.movieid %}"><img width="100%" src="https://image.tmdb.org/t/p/w500{{movie.poster}}"></a>
-        <p>{{movie.title}}</p>
+        <p class="text-center mt-2" style="font-size:23px ">{{movie.title}}</p>
       </div>
       {% endfor %}
     </div>
@@ -48,9 +44,8 @@
       </form> <hr> 
     {% endfor %}
   </div>
-  
+  {% include '_footer.html' %}
 {% endblock %}
-{% include '_footer.html' %}
 
 {% block script %}
 {% endblock %}

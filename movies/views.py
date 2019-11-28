@@ -24,41 +24,44 @@ def home(request):
     return render(request, 'movies/home.html', context)
 
 def index(request):
-    User = get_user_model()
-    user = get_object_or_404(User, username=request.user)
-    if user.preference.all():
-        now_list = recommendation_2(request.user.id)
-        movie_list = []
-        for idx in user.preference.all():   
-            genre_movie = {}
-            imsi_list = []
-            movies = []
-            genre_movie['genre'] = Genre.objects.get(id=idx.id).name
-            result = MG.objects.filter(genre = idx.id).order_by('-popularity')
-            for movie in result:
-                try:
-                    item = Movie.objects.get(movieid=movie.movieid)
-                    movies.append(item)
-                    if len(movies) == 10:
-                        break
-                except:
-                    continue
-            genre_movie['genre_movie_list'] = movies[:10]
-            
-            
+    if request.user.is_authenticated:
+        User = get_user_model()
+        user = get_object_or_404(User, username=request.user)
+        if user.preference.all():
+            now_list = recommendation_2(request.user.id)
+            movie_list = []
+            for idx in user.preference.all():   
+                genre_movie = {}
+                imsi_list = []
+                movies = []
+                genre_movie['genre'] = Genre.objects.get(id=idx.id).name
+                result = MG.objects.filter(genre = idx.id).order_by('-popularity')
+                for movie in result:
+                    try:
+                        item = Movie.objects.get(movieid=movie.movieid)
+                        movies.append(item)
+                        if len(movies) == 10:
+                            break
+                    except:
+                        continue
+                genre_movie['genre_movie_list'] = movies[:10]
+                
+                
 
-            #movie = Movie.objects.filter(genres__contains= idx.id).order_by('-popularity')
-            #embed()
-            #genre_movie['genre_movie_list'] = movie[:10]
-            movie_list.append(genre_movie)
-        context = {
-            'movie_list' : movie_list,
-            'now' : now_list
-        }
+                #movie = Movie.objects.filter(genres__contains= idx.id).order_by('-popularity')
+                #embed()
+                #genre_movie['genre_movie_list'] = movie[:10]
+                movie_list.append(genre_movie)
+            context = {
+                'movie_list' : movie_list,
+                'now' : now_list
+            }
 
-        return render(request, 'movies/index.html', context)
+            return render(request, 'movies/index.html', context)
+        else:
+            return redirect('accounts:genre')
     else:
-        return redirect('accounts:genre')
+        return redirect('/')
 
 def detail(request, movie_pk):
     movie = get_object_or_404(Movie, movieid=movie_pk)
