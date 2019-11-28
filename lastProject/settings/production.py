@@ -7,5 +7,5 @@ ALLOWED_HOSTS = [
     '*' #amazon....T T
 ]
 # 헤로쿠 위한 설정
-# import django_heroku
-# django_heroku.settings(locals())
+import django_heroku
+django_heroku.settings(locals())
