@@ -5,6 +5,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     # 배포된 url
 ]
-
-import django_heroku
-django_heroku.settings(locals())
+# 헤로쿠 위한 설정
+# import django_heroku
+# django_heroku.settings(locals())
